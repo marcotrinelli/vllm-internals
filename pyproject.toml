@@ -1,0 +1,46 @@
+[project]
+name = "vllm-internals"
+version = "0.1.0"
+description = "Record a vLLM run (per-request token trace + /metrics time series) and replay it in a static viewer"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+]
+
+[dependency-groups]
+notebook = [
+    "ipykernel>=6.29",
+    "jupyter>=1.1",
+]
+dev = [
+    "nbformat>=5.10",
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[tool.uv]
+# `uv sync` installs both groups; CI skips the notebook one (`--no-group notebook`)
+default-groups = ["dev", "notebook"]
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["vllm_internals"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["notebooks"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+# pairwise zip(xs, xs[1:]) is meant to stop at the shorter one
+ignore = ["B905"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

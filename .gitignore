@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+# trace + metrics files the notebook writes
+runs/
+node_modules/
+app/dist/
+.DS_Store
