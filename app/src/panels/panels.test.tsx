@@ -81,8 +81,9 @@ describe('panels render the example run', () => {
       .toContain('submit → first token');
   });
 
-  it('splash lists load errors', () => {
-    expect(renderToString(<Splash hot={false} errors={['x.json: unsupported schema']} onPick={noop} />))
-      .toContain('x.json: unsupported schema');
+  it('splash lists load errors and the samples', () => {
+    const html = renderToString(<Splash hot={false} errors={['x.json: unsupported schema']} onPick={noop} onSample={noop} />);
+    expect(html).toContain('x.json: unsupported schema');
+    expect(html).toContain('Prefix caching');
   });
 });
