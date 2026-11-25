@@ -4,10 +4,11 @@ Record what a vLLM server does with a handful of requests, then replay it: when 
 queued, prefilled and decoded, every token's arrival and content, and what the scheduler and
 the KV cache were doing at the same instant.
 
-Architecture: a small Python package (`vllm_internals/`) and a notebook drive the server's
-OpenAI-compatible API and write two files per run, a per-request trace (`vllm-traces/1`) and
-a `/metrics` time series (`vllm-metrics/1`). A static React app (`app/`) loads those files by
-drag and drop and never talks to a server.
+[Try it in the browser](https://marcotrinelli.github.io/vllm-internals/?sample=prefix): a run of
+12 requests sharing a long document, recorded against the mock server in `tests/mock_vllm.py`.
+Nothing to install, no GPU needed.
+
+[![12 requests sharing a prefix replayed: the waiting queue drains into a batch of four while most of each prompt comes from the prefix cache](docs/demo.gif)](https://marcotrinelli.github.io/vllm-internals/?sample=prefix)
 
 > [!NOTE]
 > Use vllm-internals to understand how vLLM works inside, from a real inference: record a few
@@ -88,10 +89,16 @@ npm ci
 npm run dev                  # http://localhost:5274 (or `npm run build && npm run preview`)
 ```
 
-Drop both files on the page (or use "Open files…"). Either file alone also works. Sample
-files from the mock server are in `examples/`.
+Drop both files on the page (or use "Open files…"). Either file alone also works. The page
+also replays the two sample runs in `examples/` (`prefix` and `batch`, recorded against the
+mock server), and `?sample=<name>` in the URL opens one directly.
 
 ## Layout
+
+A small Python package (`vllm_internals/`) and a notebook drive the server's OpenAI-compatible
+API and write two files per run, a per-request trace (`vllm-traces/1`) and a `/metrics` time
+series (`vllm-metrics/1`). A static React app (`app/`) loads those files by drag and drop and
+never talks to a vLLM server.
 
 ```
 vllm_internals/   client.py (config, streaming chat, /tokenize), trace.py (vllm-traces/1),
@@ -99,7 +106,7 @@ vllm_internals/   client.py (config, streaming chat, /tokenize), trace.py (vllm-
 notebooks/        vllm_client.ipynb
 app/              Vite + React + TypeScript viewer; parsing and validation in src/model/
 docs/schemas.md   both file formats, the latency definitions, what is reconstructed
-examples/         a small run recorded against tests/mock_vllm.py
+examples/         two small runs (prefix, batch) recorded against tests/mock_vllm.py
 tests/            pytest suite and the mock server
 ```
 
@@ -110,7 +117,8 @@ uv run ruff check . && uv run pytest              # Python
 cd app && npm run typecheck && npm test && npm run build
 ```
 
-Clear the notebook outputs before committing (`tests/test_notebook.py` fails otherwise).
+Clear the notebook outputs before committing (`tests/test_notebook.py` fails otherwise). Every
+push to `main` deploys the viewer to GitHub Pages (`.github/workflows/pages.yml`).
 
 ## Configuration
 
