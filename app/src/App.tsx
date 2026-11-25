@@ -20,6 +20,7 @@ import { Latency } from './panels/Latency';
 import { RequestDetail } from './panels/RequestDetail';
 import { RunSummary } from './panels/RunSummary';
 import { Scheduler } from './panels/Scheduler';
+import { fetchSample } from './samples';
 
 // a picked range narrower than this share of the run is a slip of the mouse
 const MIN_RANGE = 1 / 200;
@@ -65,6 +66,20 @@ export default function App() {
     setT(0);
     setPlaying(errs.length === 0);
   }, []);
+
+  const openSample = useCallback(async (name: string) => {
+    try {
+      await load(await fetchSample(name));
+    } catch (e) {
+      setErrors([String((e as Error).message ?? e)]);
+    }
+  }, [load]);
+
+  // so a link can go straight to a replay
+  useEffect(() => {
+    const name = new URLSearchParams(window.location.search).get('sample');
+    if (name) { void openSample(name); }
+  }, [openSample]);
 
   useEffect(() => {
     const over = (e: DragEvent) => { e.preventDefault(); setHot(true); };
@@ -145,7 +160,7 @@ export default function App() {
   const pick = () => pickRef.current?.click();
 
   if (!run || !axis) {
-    return <>{picker}<Splash hot={hot} errors={errors} onPick={pick} /></>;
+    return <>{picker}<Splash hot={hot} errors={errors} onPick={pick} onSample={openSample} /></>;
   }
   const selected = sel != null ? run.byId.get(sel) : undefined;
   return (

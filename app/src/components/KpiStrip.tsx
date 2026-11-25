@@ -110,7 +110,7 @@ export function KpiStrip({ run, t }: { run: Run; t: number }) {
     <div className="kpis">
       <Kpi label="Running" value={int(row.running)} sub={cores > 1 ? `across ${cores} engine cores` : 'in the batch'}
         color={PALETTE.running} spark={spark((x) => x.running)} />
-      <Kpi label="Waiting" value={int(row.waiting)} sub={reasons || 'queue empty'}
+      <Kpi label="Waiting" value={int(row.waiting)} sub={reasons || (row.waiting ? 'in the queue' : 'queue empty')}
         color={PALETTE.waiting} tone={row.waiting ? 'warn' : 'plain'} spark={spark((x) => x.waiting)} />
       <Kpi label="KV cache" value={rec.hasKv ? pct(row.kv) : '—'}
         sub={rec.nBlocks ? `${int(rec.nBlocks)} blocks${cores > 1 ? ' per core' : ''}` : 'pool size unknown'}
